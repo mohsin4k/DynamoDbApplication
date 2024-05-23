@@ -1,10 +1,92 @@
 import client from "../dbConfig.js";
+import dotenv from "dotenv";
 import {
   PutItemCommand,
   GetItemCommand,
   DeleteItemCommand,
+  QueryCommand,
 } from "@aws-sdk/client-dynamodb";
-import { generateRandomNumber } from "../utility.js";
+import { generateRandomNumber, generateToken } from "../utility.js";
+import bcrypt from "bcrypt";
+
+dotenv.config();
+
+//Service to log out the user
+export const logout = async (id) => {
+  const command = new DeleteItemCommand({
+    TableName: "dev-user-token",
+    Key: {
+      id: { N: id },
+    },
+  });
+
+  try {
+    const response = await client.send(command);
+    return response;
+  } catch (error) {
+    console.error("Error deleting token:", error);
+  }
+};
+
+//Service to login the user with the help of jwt token
+export const login = async (email, password) => {
+  let user = await getUserByEmail(email);
+
+  if (!user) {
+    return { result: "User not found!" };
+  }
+
+  const matched = await bcrypt.compare(password, user[0].password.S);
+
+  if (!matched) {
+    return { result: "Incorrect Password!" };
+  }
+
+  const jwt_sec_key = process.env.JWT_SECRET_KEY;
+
+  const token = generateToken(user[0].id.N, jwt_sec_key);
+
+  const alreadyLoggedInUser = await getTokenUserById(user[0].id.N);
+
+  if (!alreadyLoggedInUser) {
+    const addToken = await addLoginUserToken(user[0].id.N, token);
+  }
+
+  const retToken = alreadyLoggedInUser ? alreadyLoggedInUser.token.S : token;
+
+  return { token: retToken };
+};
+
+//This method helps in adding token to table so that it can be verified doing further operations
+const addLoginUserToken = async (id, token) => {
+  try {
+    const command = new PutItemCommand({
+      TableName: "dev-user-token",
+      Item: {
+        id: { N: id },
+        token: { S: token },
+      },
+    });
+
+    const response = await client.send(command);
+    return response;
+  } catch (err) {
+    console.error("Error adding user:", err);
+  }
+};
+
+//This is to get user from token table to see if user exist or not
+export const getTokenUserById = async (id) => {
+  const command = new GetItemCommand({
+    TableName: "dev-user-token",
+    Key: {
+      id: { N: id },
+    },
+  });
+
+  const response = await client.send(command);
+  return response.Item;
+};
 
 //This is to be fetch all user data
 export const fetchAllUsersData = async () => {
@@ -37,13 +119,17 @@ export const fetchAllUsersData = async () => {
 
 //this function helps in adding user to users table
 export const addUser = async (userObject) => {
+  const saltRounds = +process.env.SALT_ROUNDS;
+
+  const hashedPassword = await bcrypt.hash(userObject.password, saltRounds);
+
   const command = new PutItemCommand({
     TableName: "dev-users",
     Item: {
       id: { N: generateRandomNumber(1, 1000) },
       name: { S: userObject.name },
       email: { S: userObject.email },
-      password: { S: userObject.password },
+      password: { S: hashedPassword },
     },
   });
 
@@ -62,6 +148,25 @@ export const getUser = async (id) => {
 
   const response = await client.send(command);
   return response;
+};
+
+//This method helps in getting the user by email
+const getUserByEmail = async (email) => {
+  const command = new QueryCommand({
+    TableName: "dev-users",
+    IndexName: "EmailIndex",
+    KeyConditionExpression: "email = :email",
+    ExpressionAttributeValues: {
+      ":email": { S: email },
+    },
+  });
+
+  try {
+    const response = await client.send(command);
+    return response.Items;
+  } catch (error) {
+    console.error("Error querying table:", error);
+  }
 };
 
 //Function which helps in deleting the user by Id

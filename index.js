@@ -1,19 +1,24 @@
 import express from "express";
 import dotenv from "dotenv";
-import { addProduct } from "./services/productService.js";
 import userRoute from "./routes/userRoute.js";
 import productRoute from "./routes/productRoute.js";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 
+//This middleware is for enabling cross origin security
+app.use(
+  cors({
+    credentials: true,
+    origin: "*", //this enables every url to access the end-point
+  })
+);
+
 const PORT = process.env.PORT || 3000;
 
+//this middleware to make json understand to node
 app.use(express.json());
-
-app.listen(PORT, () => {
-  console.log(`server running on port: ${PORT}`);
-});
 
 //A testing api
 app.get("/", (req, res) => {
@@ -24,3 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoute);
 app.use("/products", productRoute);
+
+app.listen(PORT, () => {
+  console.log(`server running on port: ${PORT}`);
+});
