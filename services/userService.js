@@ -184,6 +184,12 @@ export const deleteUser = async (id) => {
 };
 
 export const getWishlist = async (userId) => {
+  const token = await getTokenUserById(userId);
+
+  if (!token) {
+    return { result: "Not Authorized" };
+  }
+
   const wishList = await fetchWishlistItemsByUserId(userId);
   const allProducts = [];
 

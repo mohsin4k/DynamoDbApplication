@@ -83,6 +83,11 @@ export const deleteUserByIdHandler = async (req, res) => {
 export const getWishlistHandler = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
+
+    if (!authHeader) {
+      res.status(404).json({ result: "Not Authorized" });
+      return;
+    }
     const token = authHeader.substring(7);
 
     const userId = getIdFromJwt(token);
@@ -99,6 +104,10 @@ export const addWishlistHandler = async (req, res) => {
   try {
     const { productId } = req.body;
     const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      res.status(404).json({ result: "Not Authorized" });
+      return;
+    }
     const token = authHeader.substring(7);
 
     const userId = getIdFromJwt(token);

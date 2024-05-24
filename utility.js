@@ -25,7 +25,6 @@ export const getIdFromJwt = (token) => {
     // Extract the id from the payload
     const userId = decodedToken.userId;
 
-    console.log("User ID:", userId);
     return userId;
   } catch (error) {
     console.error("Error decoding token:", error);
