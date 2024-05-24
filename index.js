@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoute);
 app.use("/products", productRoute);
 
+//express way of setting up http server
 app.listen(PORT, () => {
   console.log(`server running on port: ${PORT}`);
 });

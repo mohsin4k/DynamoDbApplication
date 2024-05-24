@@ -80,6 +80,7 @@ export const deleteUserByIdHandler = async (req, res) => {
   }
 };
 
+//This Handler helps in getting the wishlist of the user which is logged in right now
 export const getWishlistHandler = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -100,12 +101,13 @@ export const getWishlistHandler = async (req, res) => {
   }
 };
 
+//This Handler helps in adding an item to wishlist by the user
 export const addWishlistHandler = async (req, res) => {
   try {
     const { productId } = req.body;
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
-      res.status(404).json({ result: "Not Authorized" });
+      res.status(404).json({ result: "Not Authorized" }); //if user is not logged in it is not authorized
       return;
     }
     const token = authHeader.substring(7);

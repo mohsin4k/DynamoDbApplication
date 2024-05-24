@@ -183,6 +183,7 @@ export const deleteUser = async (id) => {
   return response;
 };
 
+//Service for getting all the items in wishlist for a particular user
 export const getWishlist = async (userId) => {
   const token = await getTokenUserById(userId);
 
@@ -193,6 +194,7 @@ export const getWishlist = async (userId) => {
   const wishList = await fetchWishlistItemsByUserId(userId);
   const allProducts = [];
 
+  //fetching all the product according to product ID
   for (let i = 0; i < wishList.length; i++) {
     const item = wishList[i];
     let pId = item?.productId?.N;
@@ -203,6 +205,7 @@ export const getWishlist = async (userId) => {
   return allProducts;
 };
 
+//Function to query all the items in wishlist with a particular user Id
 const fetchWishlistItemsByUserId = async (userId) => {
   const params = {
     TableName: "dev-wishlist",
@@ -223,6 +226,7 @@ const fetchWishlistItemsByUserId = async (userId) => {
   }
 };
 
+//As the name suggest this service helps in adding an item to wishlist
 export const addItemToWishlist = async (productId, userId) => {
   const id = generateRandomNumber(1, 1000);
   const command = new PutItemCommand({
