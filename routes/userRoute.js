@@ -1,9 +1,11 @@
 import express from "express";
 import {
   addUserHandler,
+  addWishlistHandler,
   deleteUserByIdHandler,
   getAllUsersHandler,
   getUserByIdHandler,
+  getWishlistHandler,
   loginHandler,
   logoutHandler,
 } from "../controllers/userController.js";
@@ -17,5 +19,7 @@ router.get("/get-all-users", getAllUsersHandler);
 router.post("/signup", addUserHandler);
 router.get("/:id", getUserByIdHandler);
 router.delete("/delete/:id", deleteUserByIdHandler);
+router.get("/get/wish-list", getWishlistHandler);
+router.post("/add-wishlist", addWishlistHandler);
 
 export default router;

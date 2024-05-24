@@ -99,16 +99,39 @@ import bcrypt from "bcrypt";
 
 // createTable();
 
-export const getTokenUserById = async (id) => {
-  const command = new GetItemCommand({
-    TableName: "dev-user-token",
-    Key: {
-      id: { N: id },
-    },
-  });
+// export const getTokenUserById = async (id) => {
+//   const command = new GetItemCommand({
+//     TableName: "dev-user-token",
+//     Key: {
+//       id: { N: id },
+//     },
+//   });
 
-  const response = await client.send(command);
-  return response.Item;
+//   const response = await client.send(command);
+//   return response.Item;
+// };
+
+// console.log(await getTokenUserById(1));
+
+const fetchWishlistItemsByUserId = async (userId) => {
+  const params = {
+    TableName: "dev-wishlist",
+    IndexName: "WishlistIdIndex",
+    KeyConditionExpression: "userId = :userId",
+    ExpressionAttributeValues: {
+      ":userId": { N: userId }, // Convert userId to Number type
+    },
+  };
+
+  try {
+    const command = new QueryCommand(params);
+    const response = await client.send(command);
+    console.log("Wishlist items for user ID:", userId, response.Items);
+    return response.Items;
+  } catch (error) {
+    console.error("Error fetching wishlist items:", error);
+    throw error; // Optionally handle or rethrow the error
+  }
 };
 
-console.log(await getTokenUserById(1));
+fetchWishlistItemsByUserId(746);

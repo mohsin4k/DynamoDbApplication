@@ -5,6 +5,8 @@ import {
   fetchAllUsersData,
   login,
   logout,
+  addItemToWishlist,
+  getWishlist,
 } from "../services/userService.js";
 import { getIdFromJwt } from "../utility.js";
 
@@ -72,6 +74,37 @@ export const deleteUserByIdHandler = async (req, res) => {
   try {
     const id = +req.params.id;
     let result = await deleteUser(id);
+    res.status(200).json(result);
+  } catch (err) {
+    console.log("Error Occured", err);
+  }
+};
+
+export const getWishlistHandler = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader.substring(7);
+
+    const userId = getIdFromJwt(token);
+
+    const result = await getWishlist(userId);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.log("Error Occured", err);
+  }
+};
+
+export const addWishlistHandler = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const authHeader = req.headers["authorization"];
+    const token = authHeader.substring(7);
+
+    const userId = getIdFromJwt(token);
+
+    const result = await addItemToWishlist(productId, userId);
+
     res.status(200).json(result);
   } catch (err) {
     console.log("Error Occured", err);

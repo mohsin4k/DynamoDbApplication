@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { generateRandomNumber, generateToken } from "../utility.js";
 import bcrypt from "bcrypt";
+import { getProduct } from "./productService.js";
 
 dotenv.config();
 
@@ -175,6 +176,55 @@ export const deleteUser = async (id) => {
     TableName: "dev-users",
     Key: {
       id: { N: id },
+    },
+  });
+
+  const response = await client.send(command);
+  return response;
+};
+
+export const getWishlist = async (userId) => {
+  const wishList = await fetchWishlistItemsByUserId(userId);
+  const allProducts = [];
+
+  for (let i = 0; i < wishList.length; i++) {
+    const item = wishList[i];
+    let pId = item?.productId?.N;
+    let product = await getProduct(pId);
+    allProducts.push(product.Item);
+  }
+
+  return allProducts;
+};
+
+const fetchWishlistItemsByUserId = async (userId) => {
+  const params = {
+    TableName: "dev-wishlist",
+    IndexName: "WishlistIdIndex",
+    KeyConditionExpression: "userId = :userId",
+    ExpressionAttributeValues: {
+      ":userId": { N: userId }, // Convert userId to Number type
+    },
+  };
+
+  try {
+    const command = new QueryCommand(params);
+    const response = await client.send(command);
+    return response.Items;
+  } catch (error) {
+    console.error("Error fetching wishlist items:", error);
+    throw error; // Optionally handle or rethrow the error
+  }
+};
+
+export const addItemToWishlist = async (productId, userId) => {
+  const id = generateRandomNumber(1, 1000);
+  const command = new PutItemCommand({
+    TableName: "dev-wishlist",
+    Item: {
+      id: { N: id },
+      userId: { N: userId },
+      productId: { N: productId },
     },
   });
 
