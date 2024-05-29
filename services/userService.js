@@ -199,7 +199,9 @@ export const getWishlist = async (userId) => {
     const item = wishList[i];
     let pId = item?.productId?.N;
     let product = await getProduct(pId);
-    allProducts.push(product.Item);
+    let prodObj = { ...product.Item, wishlistId: item?.id?.N };
+    // allProducts.push(product.Item);
+    allProducts.push(prodObj);
   }
 
   return allProducts;
@@ -235,6 +237,18 @@ export const addItemToWishlist = async (productId, userId) => {
       id: { N: id },
       userId: { N: userId },
       productId: { N: productId },
+    },
+  });
+
+  const response = await client.send(command);
+  return response;
+};
+
+export const deleteItemFromWishlist = async (id) => {
+  const command = new DeleteItemCommand({
+    TableName: "dev-wishlist",
+    Key: {
+      id: { N: id },
     },
   });
 

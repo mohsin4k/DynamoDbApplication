@@ -7,6 +7,7 @@ import {
   logout,
   addItemToWishlist,
   getWishlist,
+  deleteItemFromWishlist,
 } from "../services/userService.js";
 import { getIdFromJwt } from "../utility.js";
 
@@ -119,5 +120,16 @@ export const addWishlistHandler = async (req, res) => {
     res.status(200).json(result);
   } catch (err) {
     console.log("Error Occured", err);
+  }
+};
+
+//This Handler is to delete Items form wishlist
+export const deleteWishlistHandler = async (req, res) => {
+  try {
+    const id = +req.params.id;
+    let result = await deleteItemFromWishlist(id);
+    res.status(200).json(result);
+  } catch (err) {
+    console.log("error occored", err);
   }
 };

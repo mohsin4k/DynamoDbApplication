@@ -3,9 +3,13 @@ import dotenv from "dotenv";
 import userRoute from "./routes/userRoute.js";
 import productRoute from "./routes/productRoute.js";
 import cors from "cors";
+import morgan from "morgan";
 
 dotenv.config();
 const app = express();
+
+//This middleware is for logging
+app.use(morgan("combined"));
 
 //This middleware is for enabling cross origin security
 app.use(

@@ -3,6 +3,7 @@ import {
   addUserHandler,
   addWishlistHandler,
   deleteUserByIdHandler,
+  deleteWishlistHandler,
   getAllUsersHandler,
   getUserByIdHandler,
   getWishlistHandler,
@@ -21,5 +22,6 @@ router.get("/:id", getUserByIdHandler);
 router.delete("/delete/:id", deleteUserByIdHandler);
 router.get("/get/wish-list", getWishlistHandler);
 router.post("/add-wishlist", addWishlistHandler);
+router.delete("/delete-wishlist/:id", deleteWishlistHandler);
 
 export default router;
