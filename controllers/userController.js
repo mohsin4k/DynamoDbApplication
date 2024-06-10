@@ -1,3 +1,4 @@
+import { signup, verifyCode } from "../repository/Cognito.js";
 import {
   getUser,
   addUser,
@@ -49,14 +50,32 @@ export const getAllUsersHandler = async (req, res) => {
 };
 
 //This Handler helps in handling request for adding user in db
+// export const addUserHandler = async (req, res) => {
+//   try {
+//     const userObject = req.body;
+//     let result = await addUser(userObject);
+//     res.status(200).json(result);
+//   } catch (err) {
+//     console.log("Error Occured", err);
+//   }
+// };
+
+//This particular handler redirects the request to cognito service
 export const addUserHandler = async (req, res) => {
   try {
-    const userObject = req.body;
-    let result = await addUser(userObject);
+    const { name, email, password } = req.body;
+    // let result = await addUser(userObject);
+    let result = await signup(name, email, password);
     res.status(200).json(result);
   } catch (err) {
     console.log("Error Occured", err);
   }
+};
+
+export const verifyUser = async (req, res) => {
+  const { email, code } = req.body;
+  let result = verifyCode(email, code);
+  res.status(200).json(result);
 };
 
 //This Handler halps in getting user by Id if Id is present in quere params

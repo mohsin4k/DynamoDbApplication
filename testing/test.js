@@ -1,6 +1,6 @@
 //This file is to independently test any function or api
 
-import client from "./dbConfig.js";
+import client from "../repository/dbConfig.js";
 import {
   GetItemCommand,
   UpdateTableCommand,
@@ -8,6 +8,32 @@ import {
   CreateTableCommand,
 } from "@aws-sdk/client-dynamodb";
 import bcrypt from "bcrypt";
+import {
+  CognitoUserPool,
+  CognitoUserAttribute,
+} from "amazon-cognito-identity-js";
+
+const userPool = new CognitoUserPool(poolData);
+
+const attributeList = [];
+
+const dataEmail = {
+  Name: "email",
+  Value: "user@example.com",
+};
+
+const attributeEmail = new CognitoUserAttribute(dataEmail);
+
+attributeList.push(attributeEmail);
+
+userPool.signUp("username", "password", attributeList, null, (err, result) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  const cognitoUser = result.user;
+  console.log("user name is " + cognitoUser.getUsername());
+});
 
 // const queryByEmail = async (email) => {
 //   const command = new QueryCommand({
@@ -114,25 +140,25 @@ import bcrypt from "bcrypt";
 
 // console.log(await getTokenUserById(1));
 
-const fetchWishlistItemsByUserId = async (userId) => {
-  const params = {
-    TableName: "dev-wishlist",
-    IndexName: "WishlistIdIndex",
-    KeyConditionExpression: "userId = :userId",
-    ExpressionAttributeValues: {
-      ":userId": { N: userId }, // Convert userId to Number type
-    },
-  };
+// const fetchWishlistItemsByUserId = async (userId) => {
+//   const params = {
+//     TableName: "dev-wishlist",
+//     IndexName: "WishlistIdIndex",
+//     KeyConditionExpression: "userId = :userId",
+//     ExpressionAttributeValues: {
+//       ":userId": { N: userId }, // Convert userId to Number type
+//     },
+//   };
 
-  try {
-    const command = new QueryCommand(params);
-    const response = await client.send(command);
-    console.log("Wishlist items for user ID:", userId, response.Items);
-    return response.Items;
-  } catch (error) {
-    console.error("Error fetching wishlist items:", error);
-    throw error; // Optionally handle or rethrow the error
-  }
-};
+//   try {
+//     const command = new QueryCommand(params);
+//     const response = await client.send(command);
+//     console.log("Wishlist items for user ID:", userId, response.Items);
+//     return response.Items;
+//   } catch (error) {
+//     console.error("Error fetching wishlist items:", error);
+//     throw error; // Optionally handle or rethrow the error
+//   }
+// };
 
-fetchWishlistItemsByUserId(746);
+// fetchWishlistItemsByUserId(746);

@@ -1,4 +1,4 @@
-import client from "../dbConfig.js";
+import client from "../repository/dbConfig.js";
 import dotenv from "dotenv";
 import {
   PutItemCommand,
