@@ -2,6 +2,7 @@ import {
   CognitoUserPool,
   CognitoUserAttribute,
   CognitoUser,
+  AuthenticationDetails,
 } from "amazon-cognito-identity-js";
 
 import jwkToPem from "jwk-to-pem";
@@ -57,5 +58,44 @@ export const verifyCode = async (email, code) => {
     });
   } catch (error) {
     console.log("error=>", error);
+  }
+};
+
+export const loginCognito = async (email, password) => {
+  try {
+    const authenticationDetails = new AuthenticationDetails({
+      Username: email,
+      Password: password,
+    });
+
+    const userData = {
+      Username: email,
+      Pool: userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+
+    const result = await new Promise((resolve, reject) => {
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: (result) => {
+          resolve({
+            accessToken: result.getAccessToken().getJwtToken(),
+            idToken: result.getIdToken().getJwtToken(),
+            refreshToken: result.getRefreshToken().getToken(),
+          });
+        },
+        onFailure: (err) => {
+          reject({
+            message: "Failed",
+            result: err,
+          });
+        },
+      });
+    });
+
+    return result;
+  } catch (error) {
+    console.log("error=> ", error);
+    return error;
   }
 };

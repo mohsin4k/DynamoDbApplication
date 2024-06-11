@@ -7,6 +7,7 @@ import {
   getAllUsersHandler,
   getUserByIdHandler,
   getWishlistHandler,
+  loginCognitoHandler,
   loginHandler,
   logoutHandler,
   verifyUser,
@@ -23,6 +24,7 @@ router.post("/signup", addUserHandler);
 
 // AUTHENTICATION USING COGNITO
 router.post("/verify", verifyUser);
+router.post("/cog-service/login", loginCognitoHandler);
 // USERS API
 router.get("/:id", getUserByIdHandler);
 router.delete("/delete/:id", deleteUserByIdHandler);

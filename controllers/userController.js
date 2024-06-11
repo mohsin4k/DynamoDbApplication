@@ -1,4 +1,4 @@
-import { signup, verifyCode } from "../repository/Cognito.js";
+import { loginCognito, signup, verifyCode } from "../repository/Cognito.js";
 import {
   getUser,
   addUser,
@@ -60,7 +60,7 @@ export const getAllUsersHandler = async (req, res) => {
 //   }
 // };
 
-//This particular handler redirects the request to cognito service
+//This particular handler redirects the request to cognito service, below three Handlers are for Cognito service
 export const addUserHandler = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -74,9 +74,17 @@ export const addUserHandler = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   const { email, code } = req.body;
-  let result = verifyCode(email, code);
+  let result = await verifyCode(email, code);
   res.status(200).json(result);
 };
+
+export const loginCognitoHandler = async (req, res) => {
+  const { email, password } = req.body;
+  let result = await loginCognito(email, password);
+  res.status(200).json(result);
+};
+
+// -------------> Cognito Handlers End Here ----------------------------<
 
 //This Handler halps in getting user by Id if Id is present in quere params
 export const getUserByIdHandler = async (req, res) => {
